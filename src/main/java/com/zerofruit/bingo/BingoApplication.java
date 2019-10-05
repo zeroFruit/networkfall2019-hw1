@@ -16,20 +16,30 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 public class BingoApplication extends Application {
 
     static BingoClient bingoClient;
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    static String role;
+
+    static Integer number;
+
+    static Integer secret;
+
+    public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
 
         String mode = args[0];
 
         if (mode.equalsIgnoreCase("server")) {
-            new BingoServer(new GameManager()).run();
+            new BingoServer(new GameManager().setup()).run();
         } else { // client
-            new BingoClient().send(Message.ofClient("asdf", "method", 1, 1));
-//            launch();
+            bingoClient = new BingoClient();
+
+            launch();
+
+            System.out.println("BingoClient running...");
         }
 
     }
@@ -113,8 +123,8 @@ public class BingoApplication extends Application {
             if (id != null && !id.isEmpty()) {
                 try {
                     bingoClient.send(
-                            Message.ofClient(id, "login",null, null) );
-                } catch (IOException | ClassNotFoundException e) {
+                            Message.ofClient(id, "join",null, null) );
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
                 statusLabel.setText(String.format("Login id is %s", id));
@@ -145,7 +155,7 @@ public class BingoApplication extends Application {
             try {
                 bingoClient.send(
                         Message.ofClient(accountLabel.getText(), "submit", number, secret) );
-            } catch (IOException | ClassNotFoundException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
             statusLabel.setText(String.format("Submit number is %d", number));

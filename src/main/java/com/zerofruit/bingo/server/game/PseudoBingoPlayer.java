@@ -24,6 +24,11 @@ public class PseudoBingoPlayer implements BingoPlayer {
     }
 
     @Override
+    public BingoMatrix getMatrix() {
+        return bingoMatrix;
+    }
+
+    @Override
     public boolean chooseNumber(int number) {
         return bingoMatrix.markIfHas(number);
     }

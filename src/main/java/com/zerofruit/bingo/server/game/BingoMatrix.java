@@ -1,12 +1,13 @@
 package com.zerofruit.bingo.server.game;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
 
-public class BingoMatrix {
+public class BingoMatrix implements Serializable {
 
     private static final int MARK = 1;
 

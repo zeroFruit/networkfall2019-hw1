@@ -7,31 +7,39 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 public class BingoClient {
     private Socket socket;
 
-    public BingoClient() throws IOException {
-        InetAddress host = InetAddress.getLocalHost();
+    private ObjectOutputStream oos;
 
-        socket = new Socket(host.getHostAddress(), 8888);
+    private ObjectInputStream ois;
+
+    private DataHandler handler;
+
+    public BingoClient() throws IOException {
+        socket = new Socket("localhost", 8888);
+        ois = new ObjectInputStream(socket.getInputStream());
+        oos = new ObjectOutputStream(socket.getOutputStream());
+
+        this.handler = new DataHandler(socket, ois);
+        this.handler.start();
+
+        System.out.println("DataHandler running...");
     }
 
-    public void send(Message message) throws IOException, ClassNotFoundException {
-        ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-
+    public void send(Message message) throws IOException {
         System.out.println("Sending request to Socket Server");
 
         oos.writeObject(message);
+    }
 
-        ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-        Message result = (Message) ois.readObject();
-        System.out.println("Message received from server: " + result);
-
-        ois.close();
-        oos.close();
-
-        System.out.println("Closing client socket");
+    public void close() {
+        try {
+            ois.close();
+            oos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

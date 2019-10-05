@@ -1,5 +1,7 @@
 package com.zerofruit.bingo;
 
+import com.zerofruit.bingo.server.game.BingoMatrix;
+
 import java.io.Serializable;
 
 public class Message implements Serializable {
@@ -7,6 +9,7 @@ public class Message implements Serializable {
     private String method;
     private Integer number;
     private Integer secret;
+    private BingoMatrix bingoMatrix;
 
     private String role;
     private boolean gameStart;
@@ -18,19 +21,27 @@ public class Message implements Serializable {
         this.secret = secret;
     }
 
-    private Message(String id, String role, Integer number, boolean gameStart) {
+    private Message(String id, String role, BingoMatrix bingoMatrix) {
         this.id = id;
         this.role = role;
-        this.number = number;
+        this.bingoMatrix = bingoMatrix;
+    }
+
+    private Message(boolean gameStart) {
         this.gameStart = gameStart;
     }
+
 
     public static Message ofClient(String id, String method, Integer number, Integer secret) {
         return new Message(id, method, number, secret);
     }
 
-    public static Message ofServer(String id, String role, Integer number, boolean gameStart) {
-        return new Message(id, role, number, gameStart);
+    public static Message ofJoinResult(String id, String role, BingoMatrix bingoMatrix) {
+        return new Message(id, role, bingoMatrix);
+    }
+
+    public static Message ofReadyToStart(boolean readyToStart) {
+        return new Message(readyToStart);
     }
 
     public String getId() {
