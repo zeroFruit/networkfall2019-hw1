@@ -1,5 +1,7 @@
 package com.zerofruit.bingo.server;
 
+import com.zerofruit.bingo.Message;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -22,18 +24,18 @@ public class BingoServer {
 
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
 
-            String msg = (String) ois.readObject();
+            Message msg = (Message) ois.readObject();
 
             System.out.println("Received message from client: " + msg);
 
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 
-            oos.writeObject(String.format("Hi client: %s", msg));
+            oos.writeObject(msg);
 
             ois.close();
             oos.close();
 
-            if (msg.equalsIgnoreCase("exit")) {
+            if (msg.getId().equals("exit")) {
                 break;
             }
         }

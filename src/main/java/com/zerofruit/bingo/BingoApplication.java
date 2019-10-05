@@ -5,8 +5,6 @@ import com.zerofruit.bingo.server.BingoServer;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -14,8 +12,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -23,15 +19,14 @@ import java.io.IOException;
 public class BingoApplication extends Application {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 
-//        String mode = args[0];
-//        int port = Integer.parseInt(args[1]);
-//
-//        if (mode.equalsIgnoreCase("server")) {
-//            new BingoServer().run();
-//        } else {
-//            new BingoClient().send("hello socket!");
-//        }
-        launch();
+        String mode = args[0];
+
+        if (mode.equalsIgnoreCase("server")) {
+            new BingoServer().run();
+        } else {
+            launch();
+        }
+
     }
 
     @Override
@@ -96,7 +91,11 @@ public class BingoApplication extends Application {
         loginBtn.setOnAction(event -> {
             String id = idTextField.getText();
             if (id != null && !id.isEmpty()) {
-                // TODO: do some business logic
+                try {
+                    new BingoClient().send(new Message(id, "login",1, null) );
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
                 label.setText(String.format("Login id is %s", id));
                 items.add(id);
                 idTextField.clear();

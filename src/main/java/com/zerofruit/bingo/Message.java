@@ -4,11 +4,15 @@ import java.io.Serializable;
 
 public class Message implements Serializable {
     private final String id;
-    private final int number;
+    private final String method;
+    private final Integer number;
+    private final Integer secret;
 
-    public Message(String id, int number) {
+    public Message(String id, String method, Integer number, Integer secret) {
         this.id = id;
+        this.method = method;
         this.number = number;
+        this.secret = secret;
     }
 
     public String getId() {
@@ -17,5 +21,23 @@ public class Message implements Serializable {
 
     public int getNumber() {
         return number;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public Integer getSecret() {
+        return secret;
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "id='" + id + '\'' +
+                ", method='" + method + '\'' +
+                ", number=" + number +
+                ", secret=" + secret +
+                '}';
     }
 }
