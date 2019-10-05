@@ -7,13 +7,18 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 public class BingoClient {
-    public void send(Message message) throws IOException, ClassNotFoundException {
+    private Socket socket;
+
+    public BingoClient() throws IOException {
         InetAddress host = InetAddress.getLocalHost();
 
-        Socket socket = new Socket(host.getHostAddress(), 8888);
+        socket = new Socket(host.getHostAddress(), 8888);
+    }
 
+    public void send(Message message) throws IOException, ClassNotFoundException {
         ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 
         System.out.println("Sending request to Socket Server");

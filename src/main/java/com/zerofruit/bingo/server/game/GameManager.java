@@ -13,8 +13,15 @@ public class GameManager {
         return this;
     }
 
-    public void joinPlayer(BingoPlayer player) {
+    public BingoPlayer join(String id) {
+        BingoPlayer player;
+        if (room.size() == 3) {
+            player = new CulpritPlayer(id, new BingoMatrix(id));
+        } else {
+            player = new CopartnerPlayer(id, new BingoMatrix(id));
+        }
         room.addPlayer(player);
+        return player;
     }
 
     public BingoMatrix createMatrix(String clientId) {
