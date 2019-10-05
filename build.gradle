@@ -1,0 +1,31 @@
+plugins {
+    id "application"
+    id 'org.openjfx.javafxplugin' version '0.0.8'
+}
+apply plugin : "java"
+
+group 'com.zerofruit'
+version '1.0-SNAPSHOT'
+
+ext {
+    javaMainClass = "com.zerofruit.bingo.BingoApplication"
+}
+
+application {
+    mainClassName = javaMainClass
+}
+
+javafx {
+    version = "13"
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
