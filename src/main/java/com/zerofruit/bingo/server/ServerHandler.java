@@ -1,6 +1,7 @@
 package com.zerofruit.bingo.server;
 
 import com.zerofruit.bingo.Message;
+import com.zerofruit.bingo.Method;
 import com.zerofruit.bingo.game.BingoPlayer;
 import com.zerofruit.bingo.game.GameManager;
 
@@ -29,50 +30,42 @@ public class ServerHandler extends Thread {
                          ObjectOutputStream oos,
                          ObjectInputStream ois,
                          Map<String, ObjectOutputStream> outputStreamPool,
-                         GameManager gameManager) throws IOException, ClassNotFoundException {
+                         GameManager gameManager) {
         this.socket = socket;
         this.oos = oos;
         this.ois = ois;
         this.outputStreamPool = outputStreamPool;
         this.gameManager = gameManager;
-
-//        Message msg = (Message) ois.readObject();
-//        System.out.println("Received first message from client: " + msg);
-//
-//        this.id = msg.getId();
-
-
-//        synchronized (outputStreamPool) {
-//            outputStreamPool.put(id, oos);
-//        }
-//
-//        this.oos.writeObject(Message.ofHandShake());
-//        oos.writeObject(
-//                Message.ofJoinResult(
-//                        this.id,
-//                        bingoPlayer.getType().name(),
-//                        bingoPlayer.getMatrix()));
-//
-//        synchronized (gameManager) {
-//            if (gameManager.readyToStart()) {
-//                System.out.println("Ready to start!");
-//                broadcast(Message.ofReadyToStart(gameManager.readyToStart()));
-//            }
-//        }
-
     }
 
     public void run() {
         try {
             while (true) {
+                if (gameManager.isGameStarted()) {
+                    String playerId = gameManager.getCurrentTurnPlayerId();
+                    System.out.println(String.format("Current turn user id is [%s]", playerId));
+
+                    if (gameManager.isPseudoPlayer(playerId)) {
+                        gameManager.doPseudoPlayerAction(playerId);
+                        gameManager.increaseCurrentTurn();
+                        continue;
+                    }
+                }
+
                 Message msg = (Message) ois.readObject();
                 System.out.println("Received message from client: " + msg);
 
                 oos.writeObject(handle(msg));
 
-                // code smell..
-                if (gameManager.readyToStart()) {
-                    broadcast(Message.ofReadyToStart());
+                if (gameManager.readyToStart() && !gameManager.isGameStarted()) {
+                    int turn = 0;
+                    for (String id : gameManager.setupRandomTurn()) {
+                        if (!gameManager.isPseudoPlayer(id)) {
+                            send(id, Message.ofReadyToStart(id, turn));
+                        }
+                        turn++;
+                    }
+                    gameManager.startGame();
                 }
             }
 
@@ -94,19 +87,27 @@ public class ServerHandler extends Thread {
 
     public void broadcast(Message message) throws IOException {
         synchronized (outputStreamPool) {
-            Collection<ObjectOutputStream> col = outputStreamPool.values();
-            Iterator<ObjectOutputStream> iter = col.iterator();
+            Iterator<ObjectOutputStream> iter = outputStreamPool.values().iterator();
             while (iter.hasNext()) {
                 ObjectOutputStream oos = iter.next();
                 oos.writeObject(message);
             }
         }
+        System.out.println("Broadcasted message: " + message);
+    }
+
+    public void send(String id, Message message) throws IOException {
+        ObjectOutputStream oos = outputStreamPool.get(id);
+        oos.writeObject(message);
+
+        System.out.println(String.format("Send message [%s] to [%s]", message, id));
     }
 
     private Message handle(Message message) {
         switch (message.getMethod()) {
-            case "join":
+            case Method.JOIN:
                 return handleJoin(message);
+
         }
         return null;
     }
@@ -126,7 +127,7 @@ public class ServerHandler extends Thread {
 
             return Message.ofJoinResult(
                     this.id,
-                    "join_resp",
+                    Method.JOIN_RESP,
                     bingoPlayer.getType().name(),
                     bingoPlayer.getMatrix()
             );

@@ -25,4 +25,8 @@ public class Room {
                         () -> new IllegalArgumentException(String.format("player id [%s] not exist", id))
                 );
     }
+
+    public List<BingoPlayer> findAllPlayer() {
+        return bingoPlayers;
+    }
 }

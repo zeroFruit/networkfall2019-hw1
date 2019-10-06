@@ -1,8 +1,11 @@
 package com.zerofruit.bingo.game;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -10,8 +13,8 @@ import java.util.stream.IntStream;
 import static java.util.stream.Collectors.toList;
 
 public class BingoMatrix implements Serializable {
-
-    private static final int MARK = 1;
+    static final int UNMARK = 0;
+    static final int MARK = 1;
 
     private static final int MATRIX_SIZE = 5;
 
@@ -29,9 +32,7 @@ public class BingoMatrix implements Serializable {
     }
 
     private int[][] createMatrix(int[][] emptyMatrix) {
-        List<Integer> integers = IntStream.range(1, 100).boxed().collect(toList());
-
-        Collections.shuffle(integers);
+        List<Integer> integers = RandomNumberGenerator.range(1, 100);
 
         for (int r = 0; r < emptyMatrix.length; r++)  {
             for (int c = 0; c < emptyMatrix[r].length; c++) {
@@ -44,14 +45,34 @@ public class BingoMatrix implements Serializable {
 
     public boolean markIfHas(int number) {
         for (int r = 0; r < matrix.length; r++)  {
-            for (int c = 0; c < marker[r].length; c++) {
+            for (int c = 0; c < matrix[r].length; c++) {
                 if (matrix[r][c] == number) {
                     marker[r][c] = MARK;
+                    System.out.println(String.format("Marked at [%d][%d]", r, c));
+                    printMatrix();
+                    printMarker();
+                    printSpacer();
                     return true;
                 }
             }
         }
+
+        System.out.println("Not marked this turn ... :-(");
+        printMatrix();
+        printMarker();
+        printSpacer();
+
         return false;
+    }
+
+    public List<NumberAndMarker> getNumberAndMarkers() {
+        List<NumberAndMarker> result = new ArrayList<>();
+        for (int r = 0; r < matrix.length; r++)  {
+            for (int c = 0; c < matrix[r].length; c++) {
+                result.add(new NumberAndMarker(matrix[r][c], marker[r][c]));
+            }
+        }
+        return result;
     }
 
     public void printMatrix() {
@@ -60,6 +81,10 @@ public class BingoMatrix implements Serializable {
 
     public void printMarker() {
         print(marker);
+    }
+
+    public void printSpacer() {
+        System.out.println("###########################################");
     }
 
     private void print(int[][] arr) {

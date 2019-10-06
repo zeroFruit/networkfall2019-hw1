@@ -1,5 +1,6 @@
 package com.zerofruit.bingo;
 
+import com.zerofruit.bingo.game.BingoMatrix;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import lombok.Setter;
@@ -10,26 +11,27 @@ import java.util.Observer;
 
 @Setter
 public class PlayerInfoObserver implements PropertyChangeListener {
-    private boolean gameStarted;
-
-    private String role;
-
     private Label roleLabel;
     private Label gameStartLabel;
+    private Label matrixLabel;
+    private Label turnLabel;
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        System.out.println("property name: " + evt.getPropertyName());
-        System.out.println("propertyChange fired: " + evt.getNewValue().toString());
-
+        System.out.println("property updated: " + evt.getPropertyName());
 
         switch (evt.getPropertyName()) {
             case "role":
                 Platform.runLater(() -> roleLabel.setText(evt.getNewValue().toString()));
                 break;
+            case "bingoMatrix":
+                Platform.runLater(() -> matrixLabel.setText(evt.getNewValue().toString()));
+                break;
             case "gameStarted":
                 Platform.runLater(() -> gameStartLabel.setText(evt.getNewValue().toString()));
                 break;
+            case "turn":
+                Platform.runLater(() -> turnLabel.setText(((Integer) evt.getNewValue()).toString()));
             default:
                 return;
         }

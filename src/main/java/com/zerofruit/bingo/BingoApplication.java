@@ -103,9 +103,12 @@ public class BingoApplication extends Application {
         final Label roleLabel = addLabel(gridPane, "[Your Role]", 0, 7, 3);
         final Label matrixLabel = addLabel(gridPane, "[Your matrix]", 0, 9, 6);
         final Label gameStartLabel = addLabel(gridPane, "[Game Started?]", 0, 11, 3);
+        final Label turnLabel = addLabel(gridPane, "[Your Turn is]", 0, 13, 3);
 
         playerInfoObserver.setRoleLabel(roleLabel);
         playerInfoObserver.setGameStartLabel(gameStartLabel);
+        playerInfoObserver.setMatrixLabel(matrixLabel);
+        playerInfoObserver.setTurnLabel(turnLabel);
 
         // Setting an action for the login button
         loginBtn.setOnAction(event -> {
@@ -113,7 +116,7 @@ public class BingoApplication extends Application {
             if (id != null && !id.isEmpty()) {
                 try {
                     bingoClient.send(
-                            Message.ofJoinRequest(id, "join",null, null) );
+                            Message.ofJoinRequest(id, Method.JOIN,null, null) );
                     Thread.sleep(100);
                     System.out.println(bingoClient.getPlayerInfo().toString());
                 } catch (IOException | InterruptedException e) {
@@ -125,8 +128,6 @@ public class BingoApplication extends Application {
                 idTextField.clear();
             }
         });
-
-        // TODO: watch PlayerInfo
 
         // Setting an action for the submit button
         submitBtn.setOnAction(event -> {

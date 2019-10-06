@@ -1,10 +1,22 @@
 package com.zerofruit.bingo.game;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class GameManager {
+
+    private boolean started;
 
     private Room room;
 
+    private List<String> turns;
+
+    private Integer currentTurn;
+
     public GameManager setup() {
+        turns = new ArrayList<>();
+
         room = new Room();
         room.addPlayer(new PseudoBingoPlayer("pseudo1", createMatrix("pseudo1")));
         room.addPlayer(new PseudoBingoPlayer("pseudo2", createMatrix("pseudo2")));
@@ -33,8 +45,70 @@ public class GameManager {
         return room.size() == 5;
     }
 
+    public List<String> setupRandomTurn() {
+        List<Integer> turns = RandomNumberGenerator.range(0, 5);
+
+        List<BingoPlayer> allPlayer = room.findAllPlayer();
+
+        List<String> result = turns.stream()
+                .map(turn -> allPlayer.get(turn).getId())
+                .collect(Collectors.toList());
+
+        this.turns = result;
+
+        System.out.println("Random turn assigned: " + result);
+
+        return result;
+    }
+
     public boolean chooseNumber(String clientId, int number) {
         BingoPlayer player = room.findPlayerById(clientId);
         return player.chooseNumber(number);
+    }
+
+    public boolean isPseudoPlayer(String id) {
+        return room.findPlayerById(id).getType().equals(PlayerType.PSEUDO);
+    }
+
+    public void startGame() {
+        this.currentTurn = 0;
+        this.started = true;
+    }
+
+    public boolean isGameStarted() {
+        return this.started;
+    }
+
+    public String getCurrentTurnPlayerId() {
+        return turns.get(currentTurn);
+    }
+
+    public void increaseCurrentTurn() {
+        currentTurn++;
+    }
+
+    public void doPseudoPlayerAction(String id) {
+        BingoPlayer pseudoPlayer = room.findPlayerById(id);
+        if (!pseudoPlayer.getType().equals(PlayerType.PSEUDO)) {
+            throw new IllegalStateException("Current player is not pseudo");
+        }
+
+        boolean decided = false;
+        List<NumberAndMarker> numberAndMarkers = pseudoPlayer.getMatrix().getNumberAndMarkers();
+
+        List<Integer> randomIndices = RandomNumberGenerator.range(0, 25);
+        for (int index : randomIndices) {
+            NumberAndMarker nam = numberAndMarkers.get(index);
+            if (nam.getMarker() == BingoMatrix.MARK) {
+                continue;
+            }
+            chooseNumber(id, nam.getNumber());
+            decided = true;
+            break;
+        }
+
+        if (!decided) {
+            throw new IllegalStateException("Pseudo player do not select number, Illegal state!");
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.zerofruit.bingo.client;
 
 import com.zerofruit.bingo.Message;
+import com.zerofruit.bingo.Method;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -53,7 +54,7 @@ public class DataHandler extends Thread {
 
     private void handle(Message message) {
         switch (message.getMethod()) {
-            case "join_resp":
+            case Method.JOIN_RESP:
                 synchronized (playerInfo) {
                     playerInfo = playerInfo
                             .id(message.getId())
@@ -61,10 +62,11 @@ public class DataHandler extends Thread {
                             .bingoMatrix(message.getBingoMatrix());
                 }
                 break;
-            case "game_start":
+            case Method.GAME_START:
                 synchronized (playerInfo) {
                     playerInfo = playerInfo
-                            .gameStarted(true);
+                            .gameStarted(true)
+                            .turn(message.getTurn());
                 }
         }
     }

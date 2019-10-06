@@ -19,9 +19,16 @@ public class Message implements Serializable {
     private BingoMatrix bingoMatrix;
 
     private String role;
+    private int turn;
 
     private Message(String method) {
         this.method = method;
+    }
+
+    private Message(String id, String method, int turn) {
+        this.id = id;
+        this.method = method;
+        this.turn = turn;
     }
 
     private Message(String id, String method, Integer number, Integer secret) {
@@ -50,7 +57,7 @@ public class Message implements Serializable {
         return new Message(id, method, role, bingoMatrix);
     }
 
-    public static Message ofReadyToStart() {
-        return new Message("game_start");
+    public static Message ofReadyToStart(String id, int turn) {
+        return new Message(id, "game_start", turn);
     }
 }

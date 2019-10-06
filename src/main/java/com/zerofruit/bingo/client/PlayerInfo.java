@@ -23,6 +23,8 @@ public class PlayerInfo {
 
     private boolean gameStarted = false;
 
+    private Integer turn;
+
     public PlayerInfo() {
         propertyChangeSupport = new PropertyChangeSupport(this);
     }
@@ -57,6 +59,7 @@ public class PlayerInfo {
     }
 
     public PlayerInfo bingoMatrix(BingoMatrix bingoMatrix) {
+        propertyChangeSupport.firePropertyChange("bingoMatrix", this.bingoMatrix, bingoMatrix);
         this.bingoMatrix = bingoMatrix;
         return this;
     }
@@ -64,6 +67,13 @@ public class PlayerInfo {
     public PlayerInfo gameStarted(boolean gameStarted) {
         propertyChangeSupport.firePropertyChange("gameStarted", this.gameStarted, gameStarted);
         this.gameStarted = gameStarted;
+        return this;
+    }
+
+    public PlayerInfo turn(Integer turn) {
+        System.out.println("Turn: " + turn);
+        propertyChangeSupport.firePropertyChange("turn", this.turn, turn);
+        this.turn = turn;
         return this;
     }
 }
