@@ -14,6 +14,10 @@ public class Message implements Serializable {
     private String role;
     private boolean gameStart;
 
+    private Message(String method) {
+        this.method = method;
+    }
+
     private Message(String id, String method, Integer number, Integer secret) {
         this.id = id;
         this.method = method;
@@ -34,6 +38,10 @@ public class Message implements Serializable {
 
     public static Message ofClient(String id, String method, Integer number, Integer secret) {
         return new Message(id, method, number, secret);
+    }
+
+    public static Message ofHandShake() {
+        return new Message("handshake");
     }
 
     public static Message ofJoinResult(String id, String role, BingoMatrix bingoMatrix) {

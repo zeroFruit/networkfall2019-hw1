@@ -3,6 +3,7 @@ package com.zerofruit.bingo.server;
 import com.zerofruit.bingo.server.game.GameManager;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -28,9 +29,18 @@ public class BingoServer {
 
                 Socket socket = server.accept();
 
+                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+
                 System.out.println("Accepted connection request");
 
-                ServerHandler handler = new ServerHandler(socket, outputStreamPool, gameManager);
+                ServerHandler handler = new ServerHandler(
+                        socket,
+                        oos,
+                        ois,
+                        outputStreamPool,
+                        gameManager
+                );
                 handler.start();
 
                 System.out.println("Running client handler...");

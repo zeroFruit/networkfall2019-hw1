@@ -25,13 +25,28 @@ public class ServerHandler extends Thread {
 
     private GameManager gameManager;
 
-    public ServerHandler(Socket socket, Map<String, ObjectOutputStream> outputStreamPool, GameManager gameManager) throws IOException, ClassNotFoundException {
+    public ServerHandler(Socket socket,
+                         ObjectOutputStream oos,
+                         ObjectInputStream ois,
+                         Map<String, ObjectOutputStream> outputStreamPool,
+                         GameManager gameManager) throws IOException, ClassNotFoundException {
         this.socket = socket;
+        this.oos = oos;
+        this.ois = ois;
         this.outputStreamPool = outputStreamPool;
-        this.oos = new ObjectOutputStream(socket.getOutputStream());
-        this.ois = new ObjectInputStream(socket.getInputStream());
-
         this.gameManager = gameManager;
+
+//        Message msg = (Message) ois.readObject();
+//        System.out.println("Received first message from client: " + msg);
+//
+//        this.id = msg.getId();
+
+
+//        synchronized (outputStreamPool) {
+//            outputStreamPool.put(id, oos);
+//        }
+//
+//        this.oos.writeObject(Message.ofHandShake());
 //        oos.writeObject(
 //                Message.ofJoinResult(
 //                        this.id,
@@ -100,12 +115,16 @@ public class ServerHandler extends Thread {
         this.init = true;
 
         // Bingo player join the room, and assigned role
-//        BingoPlayer bingoPlayer = null;
         synchronized (gameManager) {
             BingoPlayer bingoPlayer = gameManager.join(this.id);
             System.out.println(String.format("Bingo player ID [%s] join the room", this.id));
+            return Message.ofJoinResult(
+                    this.id,
+                    bingoPlayer.getType().name(),
+                    bingoPlayer.getMatrix()
+            );
         }
-        return message;
+
     }
 
 }

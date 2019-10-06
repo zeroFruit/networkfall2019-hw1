@@ -18,10 +18,11 @@ public class DataHandler extends Thread {
 
     public void run() {
         try {
-            Message message = (Message) ois.readObject();
+            while (true) {
+                Message message = (Message) ois.readObject();
 
-            System.out.println("Received message from server:" + message);
-
+                System.out.println("Received message from server:" + message);
+            }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
