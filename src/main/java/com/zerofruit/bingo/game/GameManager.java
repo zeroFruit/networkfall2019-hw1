@@ -1,4 +1,4 @@
-package com.zerofruit.bingo.server.game;
+package com.zerofruit.bingo.game;
 
 public class GameManager {
 
@@ -29,6 +29,7 @@ public class GameManager {
     }
 
     public boolean readyToStart() {
+        System.out.println("Room size is " + room.size());
         return room.size() == 5;
     }
 

@@ -1,13 +1,13 @@
-package com.zerofruit.bingo.server.game;
+package com.zerofruit.bingo.game;
 
-public class CulpritPlayer implements BingoPlayer {
-    private PlayerType type = PlayerType.CULPRIT;
+public class CopartnerPlayer implements BingoPlayer {
+    private PlayerType type = PlayerType.COPARTNER;
 
     private String id;
 
     private BingoMatrix bingoMatrix;
 
-    public CulpritPlayer(String id, BingoMatrix bingoMatrix) {
+    public CopartnerPlayer(String id, BingoMatrix bingoMatrix) {
         this.id = id;
         this.bingoMatrix = bingoMatrix;
     }

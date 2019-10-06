@@ -1,9 +1,7 @@
-package com.zerofruit.bingo.server.game;
+package com.zerofruit.bingo.game;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.util.stream.Collectors.toList;
 
 public class Room {
     private List<BingoPlayer> bingoPlayers = new ArrayList<>();

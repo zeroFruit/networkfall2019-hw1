@@ -1,11 +1,11 @@
 package com.zerofruit.bingo.client;
 
 import com.zerofruit.bingo.Message;
+import com.zerofruit.bingo.PlayerInfoObserver;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
 import java.net.Socket;
 
 public class BingoClient {
@@ -17,12 +17,16 @@ public class BingoClient {
 
     private DataHandler handler;
 
-    public BingoClient() throws IOException {
+    private PlayerInfo playerInfo;
+
+    public BingoClient(PlayerInfo playerInfo) throws IOException {
         socket = new Socket("localhost", 8888);
         ois = new ObjectInputStream(socket.getInputStream());
         oos = new ObjectOutputStream(socket.getOutputStream());
 
-        this.handler = new DataHandler(socket, ois);
+        this.playerInfo = playerInfo;
+
+        this.handler = new DataHandler(socket, ois, playerInfo);
         this.handler.start();
 
         System.out.println("DataHandler running...");
@@ -41,5 +45,9 @@ public class BingoClient {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    synchronized public PlayerInfo getPlayerInfo() {
+        return playerInfo;
     }
 }

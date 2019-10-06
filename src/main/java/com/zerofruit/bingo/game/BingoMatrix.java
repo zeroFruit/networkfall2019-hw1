@@ -1,4 +1,6 @@
-package com.zerofruit.bingo.server.game;
+package com.zerofruit.bingo.game;
+
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -69,5 +71,19 @@ public class BingoMatrix implements Serializable {
             }
             System.out.print("\n__________________________\n");
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n__________________________\n");
+        for (int[] ints : matrix) {
+            sb.append("| ");
+            for (int anInt : ints) {
+                sb.append(anInt + " | ");
+            }
+            sb.append("\n__________________________\n");
+        }
+        return sb.toString();
     }
 }

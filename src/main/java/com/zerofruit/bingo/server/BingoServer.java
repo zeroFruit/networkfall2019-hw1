@@ -1,6 +1,6 @@
 package com.zerofruit.bingo.server;
 
-import com.zerofruit.bingo.server.game.GameManager;
+import com.zerofruit.bingo.game.GameManager;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

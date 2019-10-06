@@ -1,8 +1,8 @@
 package com.zerofruit.bingo.server;
 
 import com.zerofruit.bingo.Message;
-import com.zerofruit.bingo.server.game.BingoPlayer;
-import com.zerofruit.bingo.server.game.GameManager;
+import com.zerofruit.bingo.game.BingoPlayer;
+import com.zerofruit.bingo.game.GameManager;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -69,6 +69,11 @@ public class ServerHandler extends Thread {
                 System.out.println("Received message from client: " + msg);
 
                 oos.writeObject(handle(msg));
+
+                // code smell..
+                if (gameManager.readyToStart()) {
+                    broadcast(Message.ofReadyToStart());
+                }
             }
 
         } catch (IOException | ClassNotFoundException e) {
@@ -118,8 +123,10 @@ public class ServerHandler extends Thread {
         synchronized (gameManager) {
             BingoPlayer bingoPlayer = gameManager.join(this.id);
             System.out.println(String.format("Bingo player ID [%s] join the room", this.id));
+
             return Message.ofJoinResult(
                     this.id,
+                    "join_resp",
                     bingoPlayer.getType().name(),
                     bingoPlayer.getMatrix()
             );

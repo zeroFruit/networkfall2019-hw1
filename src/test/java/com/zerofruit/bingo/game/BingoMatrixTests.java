@@ -1,4 +1,4 @@
-package com.zerofruit.bingo.server.game;
+package com.zerofruit.bingo.game;
 
 import org.junit.Test;
 

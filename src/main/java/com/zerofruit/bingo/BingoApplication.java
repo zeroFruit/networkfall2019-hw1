@@ -1,8 +1,10 @@
 package com.zerofruit.bingo;
 
 import com.zerofruit.bingo.client.BingoClient;
+import com.zerofruit.bingo.client.PlayerInfo;
+import com.zerofruit.bingo.game.PlayerType;
 import com.zerofruit.bingo.server.BingoServer;
-import com.zerofruit.bingo.server.game.GameManager;
+import com.zerofruit.bingo.game.GameManager;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,17 +18,14 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 public class BingoApplication extends Application {
 
     static BingoClient bingoClient;
 
-    static String role;
+    static PlayerInfo playerInfo;
 
-    static Integer number;
-
-    static Integer secret;
+    static PlayerInfoObserver playerInfoObserver;
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
 
@@ -35,7 +34,11 @@ public class BingoApplication extends Application {
         if (mode.equalsIgnoreCase("server")) {
             new BingoServer(new GameManager().setup()).run();
         } else { // client
-            bingoClient = new BingoClient();
+            playerInfo = new PlayerInfo();
+            playerInfoObserver = new PlayerInfoObserver();
+
+            bingoClient = new BingoClient(playerInfo);
+            playerInfo.addPropertyChangeListener(playerInfoObserver);
 
             launch();
 
@@ -45,7 +48,7 @@ public class BingoApplication extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         GridPane gridPane = new GridPane();
         gridPane.setPadding(new Insets(10, 10, 10, 10));
         gridPane.setVgap(5);
@@ -94,28 +97,15 @@ public class BingoApplication extends Application {
         GridPane.setConstraints(messageList, 0, 2);
         gridPane.getChildren().add(messageList);
 
-        // Adding a status label
-        final Label statusTitleLabel = new Label("System Status");
-        GridPane.setConstraints(statusTitleLabel, 0, 3);
-        GridPane.setColumnSpan(statusTitleLabel, 3);
-        gridPane.getChildren().add(statusTitleLabel);
+        // Adding labels
+        final Label statusLabel = addLabel(gridPane, "[System Status]", 0, 3, 3);
+        final Label accountLabel = addLabel(gridPane, "[Your ID]", 0, 5, 3);
+        final Label roleLabel = addLabel(gridPane, "[Your Role]", 0, 7, 3);
+        final Label matrixLabel = addLabel(gridPane, "[Your matrix]", 0, 9, 6);
+        final Label gameStartLabel = addLabel(gridPane, "[Game Started?]", 0, 11, 3);
 
-        final Label statusLabel = new Label();
-        GridPane.setConstraints(statusLabel, 0, 4);
-        GridPane.setColumnSpan(statusLabel, 2);
-        gridPane.getChildren().add(statusLabel);
-
-
-        // Adding a login account login
-        final Label loginStatusTitleLabel = new Label("Your ID");
-        GridPane.setConstraints(loginStatusTitleLabel, 0, 5);
-        GridPane.setColumnSpan(loginStatusTitleLabel, 3);
-        gridPane.getChildren().add(loginStatusTitleLabel);
-
-        final Label accountLabel = new Label();
-        GridPane.setConstraints(accountLabel, 0, 6);
-        GridPane.setColumnSpan(statusLabel, 2);
-        gridPane.getChildren().add(accountLabel);
+        playerInfoObserver.setRoleLabel(roleLabel);
+        playerInfoObserver.setGameStartLabel(gameStartLabel);
 
         // Setting an action for the login button
         loginBtn.setOnAction(event -> {
@@ -123,8 +113,10 @@ public class BingoApplication extends Application {
             if (id != null && !id.isEmpty()) {
                 try {
                     bingoClient.send(
-                            Message.ofClient(id, "join",null, null) );
-                } catch (IOException e) {
+                            Message.ofJoinRequest(id, "join",null, null) );
+                    Thread.sleep(100);
+                    System.out.println(bingoClient.getPlayerInfo().toString());
+                } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
                 statusLabel.setText(String.format("Login id is %s", id));
@@ -133,6 +125,8 @@ public class BingoApplication extends Application {
                 idTextField.clear();
             }
         });
+
+        // TODO: watch PlayerInfo
 
         // Setting an action for the submit button
         submitBtn.setOnAction(event -> {
@@ -154,7 +148,7 @@ public class BingoApplication extends Application {
 
             try {
                 bingoClient.send(
-                        Message.ofClient(accountLabel.getText(), "submit", number, secret) );
+                        Message.ofJoinRequest(accountLabel.getText(), "submit", number, secret) );
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -163,8 +157,22 @@ public class BingoApplication extends Application {
             numberTextField.clear();
         });
 
-        Scene scene = new Scene(gridPane, 640, 480);
+        Scene scene = new Scene(gridPane, 540, 880);
         stage.setScene(scene);
         stage.show();
+    }
+
+    private static Label addLabel(GridPane gridPane, final String labelText, int col, int row, int span) {
+        final Label lh = new Label(labelText);
+        GridPane.setConstraints(lh, col, row);
+        GridPane.setColumnSpan(lh, span);
+        gridPane.getChildren().add(lh);
+
+        final Label l = new Label();
+        GridPane.setConstraints(l, col, row + 1);
+        GridPane.setColumnSpan(l, span);
+        gridPane.getChildren().add(l);
+
+        return l;
     }
 }

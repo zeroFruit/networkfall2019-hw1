@@ -11,9 +11,12 @@ public class DataHandler extends Thread {
 
     private ObjectInputStream ois;
 
-    public DataHandler(Socket socket, ObjectInputStream ois) {
+    private PlayerInfo playerInfo;
+
+    public DataHandler(Socket socket, ObjectInputStream ois, PlayerInfo playerInfo) {
         this.socket = socket;
         this.ois = ois;
+        this.playerInfo = playerInfo;
     }
 
     public void run() {
@@ -22,6 +25,10 @@ public class DataHandler extends Thread {
                 Message message = (Message) ois.readObject();
 
                 System.out.println("Received message from server:" + message);
+
+                handle(message);
+
+                System.out.println("Handled message !");
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -41,6 +48,24 @@ public class DataHandler extends Thread {
                     System.out.println("Socket closed");
                 }
             }
+        }
+    }
+
+    private void handle(Message message) {
+        switch (message.getMethod()) {
+            case "join_resp":
+                synchronized (playerInfo) {
+                    playerInfo = playerInfo
+                            .id(message.getId())
+                            .role(message.getRole())
+                            .bingoMatrix(message.getBingoMatrix());
+                }
+                break;
+            case "game_start":
+                synchronized (playerInfo) {
+                    playerInfo = playerInfo
+                            .gameStarted(true);
+                }
         }
     }
 }
