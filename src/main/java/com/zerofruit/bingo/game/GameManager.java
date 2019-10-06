@@ -14,6 +14,8 @@ public class GameManager {
 
     private Integer currentTurn;
 
+    private Integer askedNumber;
+
     public GameManager setup() {
         turns = new ArrayList<>();
 
@@ -34,6 +36,10 @@ public class GameManager {
         }
         room.addPlayer(player);
         return player;
+    }
+
+    public List<BingoPlayer> getAllPlayers() {
+        return this.room.findAllPlayer();
     }
 
     public BingoMatrix createMatrix(String clientId) {
@@ -62,12 +68,31 @@ public class GameManager {
     }
 
     public boolean chooseNumber(String clientId, int number) {
-        BingoPlayer player = room.findPlayerById(clientId);
-        return player.chooseNumber(number);
+        boolean result = room.findPlayerById(clientId).chooseNumber(number);
+
+        room.findAllPlayer().stream().forEach(bingoPlayer -> {
+            boolean r = bingoPlayer.chooseNumber(number);
+            System.out.println(String.format("Result of bingo matrix marking: %b, id=%s", r, bingoPlayer.getId()));
+        });
+        printSpacer(clientId);
+
+        return result;
+    }
+
+    public void askInSecret(String clientId, int number) {
+        if (!isCulpritPlayer(clientId)) {
+            System.out.println("Your are not culprit, so do nothing!");
+            return;
+        }
+        askedNumber = number;
     }
 
     public boolean isPseudoPlayer(String id) {
         return room.findPlayerById(id).getType().equals(PlayerType.PSEUDO);
+    }
+
+    public boolean isCulpritPlayer(String id) {
+        return room.findPlayerById(id).getType().equals(PlayerType.CULPRIT);
     }
 
     public void startGame() {
@@ -84,7 +109,8 @@ public class GameManager {
     }
 
     public void increaseCurrentTurn() {
-        currentTurn++;
+        currentTurn += 1;
+        currentTurn %= 5;
     }
 
     public void doPseudoPlayerAction(String id) {
@@ -102,7 +128,13 @@ public class GameManager {
             if (nam.getMarker() == BingoMatrix.MARK) {
                 continue;
             }
-            chooseNumber(id, nam.getNumber());
+
+            // this picked number should be also reflect to other players!!
+            room.findAllPlayer().stream().forEach(bingoPlayer -> {
+                boolean result = bingoPlayer.chooseNumber(nam.getNumber());
+                System.out.println(String.format("Result of bingo matrix marking: %b, id=%s", result, bingoPlayer.getId()));
+            });
+            printSpacer(id);
             decided = true;
             break;
         }
@@ -110,5 +142,11 @@ public class GameManager {
         if (!decided) {
             throw new IllegalStateException("Pseudo player do not select number, Illegal state!");
         }
+    }
+
+    private void printSpacer(String id) {
+        System.out.println("###########################################");
+        System.out.println(String.format("###############[%s]###################", id) );
+        System.out.println("###########################################");
     }
 }

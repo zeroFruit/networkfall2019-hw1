@@ -116,10 +116,8 @@ public class BingoApplication extends Application {
             if (id != null && !id.isEmpty()) {
                 try {
                     bingoClient.send(
-                            Message.ofJoinRequest(id, Method.JOIN,null, null) );
-                    Thread.sleep(100);
-                    System.out.println(bingoClient.getPlayerInfo().toString());
-                } catch (IOException | InterruptedException e) {
+                            Message.ofJoinRequest(id, Method.JOIN) );
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
                 statusLabel.setText(String.format("Login id is %s", id));
@@ -148,8 +146,10 @@ public class BingoApplication extends Application {
             }
 
             try {
+                // TODO: this should be fixed
+                // TODO: add secret
                 bingoClient.send(
-                        Message.ofJoinRequest(accountLabel.getText(), "submit", number, secret) );
+                        Message.ofChooseRequest(accountLabel.getText(), number, null) );
             } catch (IOException e) {
                 e.printStackTrace();
             }

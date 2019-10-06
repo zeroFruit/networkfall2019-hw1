@@ -49,18 +49,18 @@ public class BingoMatrix implements Serializable {
                 if (matrix[r][c] == number) {
                     marker[r][c] = MARK;
                     System.out.println(String.format("Marked at [%d][%d]", r, c));
-                    printMatrix();
-                    printMarker();
-                    printSpacer();
+//                    printMatrix();
+//                    printMarker();
+//                    printSpacer();
                     return true;
                 }
             }
         }
 
         System.out.println("Not marked this turn ... :-(");
-        printMatrix();
-        printMarker();
-        printSpacer();
+//        printMatrix();
+//        printMarker();
+//        printSpacer();
 
         return false;
     }
@@ -109,6 +109,21 @@ public class BingoMatrix implements Serializable {
             }
             sb.append("\n__________________________\n");
         }
+
+        sb.append("* Current marked status\n");
+        sb.append("\n__________________________\n");
+        for (int[] ints : marker) {
+            sb.append("| ");
+            for (int anInt : ints) {
+                if (anInt == MARK) {
+                    sb.append("O | ");
+                } else {
+                    sb.append("X | ");
+                }
+            }
+            sb.append("\n__________________________\n");
+        }
+
         return sb.toString();
     }
 }

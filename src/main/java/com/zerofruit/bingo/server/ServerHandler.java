@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.sql.SQLOutput;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -47,6 +48,14 @@ public class ServerHandler extends Thread {
 
                     if (gameManager.isPseudoPlayer(playerId)) {
                         gameManager.doPseudoPlayerAction(playerId);
+
+                        for (BingoPlayer player : gameManager.getAllPlayers()) {
+                            if (gameManager.isPseudoPlayer(player.getId())) {
+                                continue;
+                            }
+                            send(player.getId(), Message.ofMatrixUpdated(player.getId(), player.getMatrix()));
+                        }
+
                         gameManager.increaseCurrentTurn();
                         continue;
                     }
@@ -93,20 +102,21 @@ public class ServerHandler extends Thread {
                 oos.writeObject(message);
             }
         }
-        System.out.println("Broadcasted message: " + message);
+        System.out.println("Broadcast message: " + message);
     }
 
     public void send(String id, Message message) throws IOException {
         ObjectOutputStream oos = outputStreamPool.get(id);
-        oos.writeObject(message);
 
-        System.out.println(String.format("Send message [%s] to [%s]", message, id));
+        oos.writeObject(message);
     }
 
-    private Message handle(Message message) {
+    private Message handle(Message message) throws IOException {
         switch (message.getMethod()) {
             case Method.JOIN:
                 return handleJoin(message);
+            case Method.CHOOSE:
+                return handleChoose(message);
 
         }
         return null;
@@ -127,12 +137,35 @@ public class ServerHandler extends Thread {
 
             return Message.ofJoinResult(
                     this.id,
-                    Method.JOIN_RESP,
                     bingoPlayer.getType().name(),
                     bingoPlayer.getMatrix()
             );
         }
+    }
 
+    private Message handleChoose(Message message) throws IOException {
+        gameManager.chooseNumber(message.getId(), message.getNumber());
+        for (BingoPlayer player : gameManager.getAllPlayers()) {
+            if (gameManager.isPseudoPlayer(player.getId())) {
+                continue;
+            }
+
+            send(player.getId(), Message.ofMatrixUpdated(player.getId(), player.getMatrix()));
+        }
+
+        if (gameManager.isCulpritPlayer(message.getId())) {
+            System.out.println("Ask secret");
+//            gameManager.askInSecret(message.getId(), message.getSecret());
+            // TODO: send message to copartner
+
+        }
+
+        gameManager.increaseCurrentTurn();
+
+        return Message.ofChooseResult(
+                this.id,
+                message.getNumber()
+        );
     }
 
 }

@@ -29,7 +29,7 @@ public class DataHandler extends Thread {
 
                 handle(message);
 
-                System.out.println("Handled message !");
+                System.out.println(String.format("Handled message ! [%s]", message.getMethod()));
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -68,6 +68,16 @@ public class DataHandler extends Thread {
                             .gameStarted(true)
                             .turn(message.getTurn());
                 }
+                break;
+            case Method.MATRIX_UPDATED:
+                synchronized (playerInfo) {
+                    playerInfo = playerInfo
+                            .bingoMatrix(message.getBingoMatrix());
+                }
+                break;
+            case Method.CHOOSE_RESP:
+                System.out.println("Successfully choose bingo number:" + message.getNumber());
+                break;
         }
     }
 }
