@@ -22,29 +22,38 @@ public class Message implements Serializable {
     private int turn;
     private String winner;
 
+    private int selected;
+
     private Message(String id, String method) {
         this.id = id;
         this.method = method;
     }
 
     private Message(String id, String method, int n) {
-        if (method.equals(Method.GAME_START)) {
-            System.out.println("GAME_START message created");
-            this.id = id;
-            this.method = method;
-            this.turn = n;
-        } else if (method.equals(Method.CHOOSE_RESP)) {
-            System.out.println("CHOOSE_RESP message created");
-            this.id = id;
-            this.method = method;
-            this.number = n;
-        } else if (method.equals(Method.SECRET)) {
-            System.out.println("SECRET message created");
-            this.id = id;
-            this.method = method;
-            this.secret = n;
-        } else {
-            throw new IllegalArgumentException("invalid method");
+        System.out.println("method>>" + method);
+        switch (method) {
+            case Method.GAME_START:
+                this.id = id;
+                this.method = method;
+                this.turn = n;
+                break;
+            case Method.CHOOSE_RESP:
+                this.id = id;
+                this.method = method;
+                this.number = n;
+                break;
+            case Method.SECRET:
+                this.id = id;
+                this.method = method;
+                this.secret = n;
+                break;
+            case Method.MATRIX_UPDATED:
+                this.id = id;
+                this.method = method;
+                this.selected = n;
+                break;
+            default:
+                throw new IllegalArgumentException("invalid method");
         }
     }
 
@@ -59,12 +68,6 @@ public class Message implements Serializable {
         this.id = id;
         this.method = method;
         this.winner = winner;
-    }
-
-    private Message(String id, String method, BingoMatrix bingoMatrix) {
-        this.id = id;
-        this.method = method;
-        this.bingoMatrix = bingoMatrix;
     }
 
     private Message(String id, String method, String role, BingoMatrix bingoMatrix) {
@@ -94,8 +97,8 @@ public class Message implements Serializable {
         return new Message(id, Method.CHOOSE_RESP, number);
     }
 
-    public static Message ofMatrixUpdated(String id, BingoMatrix bingoMatrix) {
-        return new Message(id, Method.MATRIX_UPDATED, bingoMatrix);
+    public static Message ofMatrixUpdated(String id, int selected) {
+        return new Message(id, Method.MATRIX_UPDATED, selected);
     }
 
     public static Message ofSecret(String id, Integer secret) {

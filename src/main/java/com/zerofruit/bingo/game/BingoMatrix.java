@@ -1,20 +1,12 @@
 package com.zerofruit.bingo.game;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
-
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.IntStream;
-
-import static java.util.stream.Collectors.toList;
 
 public class BingoMatrix implements Serializable {
-    static final int UNMARK = 0;
-    static final int MARK = 1;
+    public static final int UNMARK = 0;
+    public static final int MARK = 1;
 
     private static final int MATRIX_SIZE = 5;
 
@@ -49,19 +41,12 @@ public class BingoMatrix implements Serializable {
                 if (matrix[r][c] == number) {
                     marker[r][c] = MARK;
                     System.out.println(String.format("Marked at [%d][%d]", r, c));
-//                    printMatrix();
-//                    printMarker();
-//                    printSpacer();
                     return true;
                 }
             }
         }
 
         System.out.println("Not marked this turn ... :-(");
-//        printMatrix();
-//        printMarker();
-//        printSpacer();
-
         return false;
     }
 
@@ -107,29 +92,6 @@ public class BingoMatrix implements Serializable {
             }
         }
         return result;
-    }
-
-    public void printMatrix() {
-        print(matrix);
-    }
-
-    public void printMarker() {
-        print(marker);
-    }
-
-    public void printSpacer() {
-        System.out.println("###########################################");
-    }
-
-    private void print(int[][] arr) {
-        System.out.print("\n__________________________\n");
-        for (int[] ints : arr) {
-            System.out.print("| ");
-            for (int anInt : ints) {
-                System.out.print(anInt + " | ");
-            }
-            System.out.print("\n__________________________\n");
-        }
     }
 
     @Override

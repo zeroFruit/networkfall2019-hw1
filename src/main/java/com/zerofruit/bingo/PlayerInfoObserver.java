@@ -1,13 +1,11 @@
 package com.zerofruit.bingo;
 
-import com.zerofruit.bingo.game.BingoMatrix;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import lombok.Setter;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Observer;
 
 @Setter
 public class PlayerInfoObserver implements PropertyChangeListener {
@@ -20,13 +18,12 @@ public class PlayerInfoObserver implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        System.out.println("property updated: " + evt.getPropertyName());
-
         switch (evt.getPropertyName()) {
             case "role":
                 Platform.runLater(() -> roleLabel.setText(evt.getNewValue().toString()));
                 break;
             case "bingoMatrix":
+                System.out.println("at observer: " + evt.getNewValue().toString());
                 Platform.runLater(() -> matrixLabel.setText(evt.getNewValue().toString()));
                 break;
             case "gameStarted":

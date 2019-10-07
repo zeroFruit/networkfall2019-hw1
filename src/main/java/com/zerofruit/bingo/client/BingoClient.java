@@ -26,7 +26,7 @@ public class BingoClient {
 
         this.playerInfo = playerInfo;
 
-        this.handler = new DataHandler(socket, ois, playerInfo, this);
+        this.handler = new DataHandler(socket, ois, playerInfo);
         this.handler.start();
 
         System.out.println("DataHandler running...");

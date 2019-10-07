@@ -6,8 +6,6 @@ public enum PlayerType {
 
     private String name;
 
-    private BingoMatrix bingoMatrix;
-
     PlayerType(String name) {
         this.name = name;
     }

@@ -20,7 +20,7 @@ public class BingoServer {
         this.outputStreamPool = new HashMap<>();
     }
 
-    public void run() throws IOException, ClassNotFoundException {
+    public void run() throws IOException {
         ServerSocket server = new ServerSocket(8888);
 
         try {

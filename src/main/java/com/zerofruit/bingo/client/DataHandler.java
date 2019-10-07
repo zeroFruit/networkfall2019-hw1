@@ -14,13 +14,10 @@ public class DataHandler extends Thread {
 
     private PlayerInfo playerInfo;
 
-    private BingoClient bingoClient;
-
-    public DataHandler(Socket socket, ObjectInputStream ois, PlayerInfo playerInfo, BingoClient bingoClient) {
+    public DataHandler(Socket socket, ObjectInputStream ois, PlayerInfo playerInfo) {
         this.socket = socket;
         this.ois = ois;
         this.playerInfo = playerInfo;
-        this.bingoClient = bingoClient;
     }
 
     public void run() {
@@ -56,7 +53,6 @@ public class DataHandler extends Thread {
     }
 
     private void handle(Message message) {
-        System.out.println("Asdfasdf: " + message);
         switch (message.getMethod()) {
             case Method.JOIN_RESP:
                 synchronized (playerInfo) {
@@ -73,11 +69,12 @@ public class DataHandler extends Thread {
                             .turn(message.getTurn());
                 }
                 break;
-            // TODO: this currently not work
             case Method.MATRIX_UPDATED:
                 synchronized (playerInfo) {
+                    System.out.println("Selected at this turn: " + message.getSelected());
                     playerInfo = playerInfo
-                            .bingoMatrix(message.getBingoMatrix());
+                            .selected(message.getSelected());
+
                 }
                 break;
             case Method.CHOOSE_RESP:
@@ -94,8 +91,6 @@ public class DataHandler extends Thread {
                     playerInfo = playerInfo
                             .winner(message.getWinner());
                 }
-                // TODO: close connection with server
-//                bingoClient.close();
                 break;
             default:
                 throw new IllegalArgumentException(

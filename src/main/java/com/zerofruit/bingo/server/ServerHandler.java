@@ -42,22 +42,16 @@ public class ServerHandler extends Thread {
             while (true) {
                 if (gameManager.isGameStarted()) {
                     String playerId = gameManager.getCurrentTurnPlayerId();
+
                     System.out.println(String.format("Current turn user id is [%s]", playerId));
 
                     if (gameManager.isPseudoPlayer(playerId)) {
-                        gameManager.doPseudoPlayerAction(playerId);
-
-                        String winnerCandidate = gameManager.isSomeoneBingo();
-                        System.out.println("WinnerCandidate >>>" + winnerCandidate);
-                        if (winnerCandidate != null) {
-                            broadcastWinnerMessage(winnerCandidate);
+                        boolean gameIsDone = pseudoPlayerAction(playerId);
+                        if (gameIsDone) {
                             break;
+                        } else {
+                            continue;
                         }
-
-                        broadcastUpdatedMatrixMessage();
-
-                        gameManager.increaseCurrentTurn();
-                        continue;
                     }
                 }
 
@@ -67,14 +61,7 @@ public class ServerHandler extends Thread {
                 oos.writeObject(handle(msg));
 
                 if (gameManager.readyToStart() && !gameManager.isGameStarted()) {
-                    int turn = 0;
-                    for (String id : gameManager.setupRandomTurn()) {
-                        if (!gameManager.isPseudoPlayer(id)) {
-                            send(id, Message.ofReadyToStart(id, turn));
-                        }
-                        turn++;
-                    }
-                    gameManager.startGame();
+                    setupGame();
                 }
             }
 
@@ -147,15 +134,14 @@ public class ServerHandler extends Thread {
         gameManager.chooseNumber(message.getId(), message.getNumber());
 
         String winnerCandidate = gameManager.isSomeoneBingo();
-        System.out.println("WinnerCandidate >>>" + winnerCandidate);
         if (winnerCandidate != null) {
             broadcastWinnerMessage(winnerCandidate);
 
-            // TODO: close server
-            // TODO: game done!
+            // game done!
+            System.out.println("Bingo game is finished");
         }
 
-        broadcastUpdatedMatrixMessage();
+        broadcastUpdatedMatrixMessage(message.getNumber());
 
         if (gameManager.isCulpritPlayer(message.getId())) {
             gameManager.askInSecret(message.getId(), message.getSecret());
@@ -172,19 +158,44 @@ public class ServerHandler extends Thread {
         );
     }
 
-    // TODO: matrix do not updated
-    private void broadcastUpdatedMatrixMessage() {
+    private boolean pseudoPlayerAction(String playerId) {
+        boolean gameIsOver = false;
+
+        int selected = gameManager.doPseudoPlayerAction(playerId);
+
+        String winnerCandidate = gameManager.isSomeoneBingo();
+        if (winnerCandidate != null) {
+            broadcastWinnerMessage(winnerCandidate);
+            gameIsOver = true;
+        }
+
+        broadcastUpdatedMatrixMessage(selected);
+
+        gameManager.increaseCurrentTurn();
+
+        return gameIsOver;
+    }
+
+    private void setupGame() throws IOException {
+        int turn = 0;
+        for (String id : gameManager.setupRandomTurn()) {
+            if (!gameManager.isPseudoPlayer(id)) {
+                send(id, Message.ofReadyToStart(id, turn));
+            }
+            turn++;
+        }
+        gameManager.startGame();
+    }
+
+    private void broadcastUpdatedMatrixMessage(int selected) {
         gameManager.getAllPlayers()
                 .forEach(player -> {
                     if (gameManager.isPseudoPlayer(player.getId())) {
                         return;
                     }
 
-                    if (player.getId().equals("a")) {
-                        System.out.println(">>>>>> " + Message.ofMatrixUpdated(player.getId(), player.getMatrix()));
-                    }
                     try {
-                        send(player.getId(), Message.ofMatrixUpdated(player.getId(), player.getMatrix()));
+                        send(player.getId(), Message.ofMatrixUpdated(player.getId(), selected));
                     } catch (IOException e) {
                         System.out.println("Exception occurred while broadcastUpdatedMatrixMessage() in stream:" + e);
                     }

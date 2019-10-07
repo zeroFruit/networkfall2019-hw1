@@ -21,6 +21,8 @@ public class PlayerInfo {
 
     private BingoMatrix bingoMatrix;
 
+    private int selected;
+
     private boolean gameStarted = false;
 
     private Integer turn;
@@ -82,6 +84,16 @@ public class PlayerInfo {
     public PlayerInfo winner(String winner) {
         propertyChangeSupport.firePropertyChange("winner", this.winner, winner);
         this.winner = winner;
+        return this;
+    }
+
+    public PlayerInfo selected(int selected) {
+        String oldMatrixStatus = bingoMatrix.toString();
+
+        bingoMatrix.markIfHas(selected);
+
+        propertyChangeSupport.firePropertyChange("bingoMatrix", oldMatrixStatus, bingoMatrix.toString());
+
         return this;
     }
 }

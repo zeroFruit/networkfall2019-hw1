@@ -135,13 +135,14 @@ public class GameManager {
         currentTurn %= 5;
     }
 
-    public void doPseudoPlayerAction(String id) {
+    public int doPseudoPlayerAction(String id) {
         BingoPlayer pseudoPlayer = room.findPlayerById(id);
         if (!pseudoPlayer.getType().equals(PlayerType.PSEUDO)) {
             throw new IllegalStateException("Current player is not pseudo");
         }
 
         boolean decided = false;
+        Integer selected = null;
         List<NumberAndMarker> numberAndMarkers = pseudoPlayer.getMatrix().getNumberAndMarkers();
 
         List<Integer> randomIndices = RandomNumberGenerator.range(0, 25);
@@ -150,6 +151,8 @@ public class GameManager {
             if (nam.getMarker() == BingoMatrix.MARK) {
                 continue;
             }
+
+            selected = nam.getNumber();
 
             // this picked number should be also reflect to other players!!
             room.findAllPlayer().stream().forEach(bingoPlayer -> {
@@ -164,6 +167,11 @@ public class GameManager {
         if (!decided) {
             throw new IllegalStateException("Pseudo player do not select number, Illegal state!");
         }
+        if (selected == null) {
+            throw new IllegalArgumentException("There's no selected number");
+        }
+
+        return selected;
     }
 
     private void printSpacer(String id) {

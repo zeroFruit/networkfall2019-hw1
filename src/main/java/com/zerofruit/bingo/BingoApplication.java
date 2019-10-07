@@ -92,7 +92,7 @@ public class BingoApplication extends Application {
         ObservableList<String> items = FXCollections.observableArrayList();
         messageList.setItems(items);
         messageList.setPrefWidth(200);
-        messageList.setPrefHeight(200);
+        messageList.setPrefHeight(100);
 
         GridPane.setConstraints(messageList, 0, 2);
         gridPane.getChildren().add(messageList);
@@ -161,7 +161,7 @@ public class BingoApplication extends Application {
             secretTextField.clear();
         });
 
-        Scene scene = new Scene(gridPane, 540, 1100);
+        Scene scene = new Scene(gridPane, 540, 1300);
         stage.setScene(scene);
         stage.show();
     }
