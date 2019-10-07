@@ -20,6 +20,7 @@ public class Message implements Serializable {
 
     private String role;
     private int turn;
+    private String winner;
 
     private Message(String id, String method) {
         this.id = id;
@@ -28,13 +29,22 @@ public class Message implements Serializable {
 
     private Message(String id, String method, int n) {
         if (method.equals(Method.GAME_START)) {
+            System.out.println("GAME_START message created");
             this.id = id;
             this.method = method;
             this.turn = n;
-        } else {
+        } else if (method.equals(Method.CHOOSE_RESP)) {
+            System.out.println("CHOOSE_RESP message created");
             this.id = id;
             this.method = method;
             this.number = n;
+        } else if (method.equals(Method.SECRET)) {
+            System.out.println("SECRET message created");
+            this.id = id;
+            this.method = method;
+            this.secret = n;
+        } else {
+            throw new IllegalArgumentException("invalid method");
         }
     }
 
@@ -43,6 +53,12 @@ public class Message implements Serializable {
         this.method = method;
         this.number = number;
         this.secret = secret;
+    }
+
+    private Message(String id, String method, String winner) {
+        this.id = id;
+        this.method = method;
+        this.winner = winner;
     }
 
     private Message(String id, String method, BingoMatrix bingoMatrix) {
@@ -80,5 +96,13 @@ public class Message implements Serializable {
 
     public static Message ofMatrixUpdated(String id, BingoMatrix bingoMatrix) {
         return new Message(id, Method.MATRIX_UPDATED, bingoMatrix);
+    }
+
+    public static Message ofSecret(String id, Integer secret) {
+        return new Message(id, Method.SECRET, secret);
+    }
+
+    public static Message ofWinner(String id, String winner) {
+        return new Message(id, Method.WINNER, winner);
     }
 }

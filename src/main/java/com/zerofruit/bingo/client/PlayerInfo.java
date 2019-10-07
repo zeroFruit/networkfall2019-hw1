@@ -25,6 +25,8 @@ public class PlayerInfo {
 
     private Integer turn;
 
+    private String winner;
+
     public PlayerInfo() {
         propertyChangeSupport = new PropertyChangeSupport(this);
     }
@@ -54,6 +56,7 @@ public class PlayerInfo {
     }
 
     public PlayerInfo secret(Integer secret) {
+        propertyChangeSupport.firePropertyChange("secret", this.secret, secret);
         this.secret = secret;
         return this;
     }
@@ -71,9 +74,14 @@ public class PlayerInfo {
     }
 
     public PlayerInfo turn(Integer turn) {
-        System.out.println("Turn: " + turn);
         propertyChangeSupport.firePropertyChange("turn", this.turn, turn);
         this.turn = turn;
+        return this;
+    }
+
+    public PlayerInfo winner(String winner) {
+        propertyChangeSupport.firePropertyChange("winner", this.winner, winner);
+        this.winner = winner;
         return this;
     }
 }

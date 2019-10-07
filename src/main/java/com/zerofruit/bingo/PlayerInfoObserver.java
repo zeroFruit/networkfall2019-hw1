@@ -15,6 +15,8 @@ public class PlayerInfoObserver implements PropertyChangeListener {
     private Label gameStartLabel;
     private Label matrixLabel;
     private Label turnLabel;
+    private Label secretLabel;
+    private Label winnerLabel;
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -32,6 +34,12 @@ public class PlayerInfoObserver implements PropertyChangeListener {
                 break;
             case "turn":
                 Platform.runLater(() -> turnLabel.setText(((Integer) evt.getNewValue()).toString()));
+                break;
+            case "secret":
+                Platform.runLater(() -> secretLabel.setText(((Integer) evt.getNewValue()).toString()));
+                break;
+            case "winner":
+                Platform.runLater(() -> winnerLabel.setText((String) evt.getNewValue()));
             default:
                 return;
         }

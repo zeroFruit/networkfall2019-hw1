@@ -5,4 +5,5 @@ public interface BingoPlayer {
     String getId();
     BingoMatrix getMatrix();
     boolean chooseNumber(int number);
+    boolean isBingo();
 }

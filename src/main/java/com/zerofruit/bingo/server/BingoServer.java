@@ -49,20 +49,4 @@ public class BingoServer {
             e.printStackTrace();
         }
     }
-
-//    private Response mux(Message message) throws IOException {
-//        switch (message.getMethod()) {
-//            case "login":
-//                BingoPlayer bingoPlayer = gameManager.join(message.getId());
-//                broadcast();
-////                return new Response(
-////                        message.getId(),
-////                        bingoPlayer.getType().name(),
-////                        null,
-////                        gameManager.readyToStart()
-////                );
-//            default:
-//                throw new IllegalArgumentException("Unexpected method");
-//        }
-//    }
 }

@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.sql.SQLOutput;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -49,12 +47,14 @@ public class ServerHandler extends Thread {
                     if (gameManager.isPseudoPlayer(playerId)) {
                         gameManager.doPseudoPlayerAction(playerId);
 
-                        for (BingoPlayer player : gameManager.getAllPlayers()) {
-                            if (gameManager.isPseudoPlayer(player.getId())) {
-                                continue;
-                            }
-                            send(player.getId(), Message.ofMatrixUpdated(player.getId(), player.getMatrix()));
+                        String winnerCandidate = gameManager.isSomeoneBingo();
+                        System.out.println("WinnerCandidate >>>" + winnerCandidate);
+                        if (winnerCandidate != null) {
+                            broadcastWinnerMessage(winnerCandidate);
+                            break;
                         }
+
+                        broadcastUpdatedMatrixMessage();
 
                         gameManager.increaseCurrentTurn();
                         continue;
@@ -145,19 +145,23 @@ public class ServerHandler extends Thread {
 
     private Message handleChoose(Message message) throws IOException {
         gameManager.chooseNumber(message.getId(), message.getNumber());
-        for (BingoPlayer player : gameManager.getAllPlayers()) {
-            if (gameManager.isPseudoPlayer(player.getId())) {
-                continue;
-            }
 
-            send(player.getId(), Message.ofMatrixUpdated(player.getId(), player.getMatrix()));
+        String winnerCandidate = gameManager.isSomeoneBingo();
+        System.out.println("WinnerCandidate >>>" + winnerCandidate);
+        if (winnerCandidate != null) {
+            broadcastWinnerMessage(winnerCandidate);
+
+            // TODO: close server
+            // TODO: game done!
         }
 
-        if (gameManager.isCulpritPlayer(message.getId())) {
-            System.out.println("Ask secret");
-//            gameManager.askInSecret(message.getId(), message.getSecret());
-            // TODO: send message to copartner
+        broadcastUpdatedMatrixMessage();
 
+        if (gameManager.isCulpritPlayer(message.getId())) {
+            gameManager.askInSecret(message.getId(), message.getSecret());
+            // send secret message to copartner
+            String copartnerId = gameManager.getCopartner().getId();
+            send(copartnerId, Message.ofSecret(copartnerId, message.getSecret()));
         }
 
         gameManager.increaseCurrentTurn();
@@ -166,6 +170,39 @@ public class ServerHandler extends Thread {
                 this.id,
                 message.getNumber()
         );
+    }
+
+    // TODO: matrix do not updated
+    private void broadcastUpdatedMatrixMessage() {
+        gameManager.getAllPlayers()
+                .forEach(player -> {
+                    if (gameManager.isPseudoPlayer(player.getId())) {
+                        return;
+                    }
+
+                    if (player.getId().equals("a")) {
+                        System.out.println(">>>>>> " + Message.ofMatrixUpdated(player.getId(), player.getMatrix()));
+                    }
+                    try {
+                        send(player.getId(), Message.ofMatrixUpdated(player.getId(), player.getMatrix()));
+                    } catch (IOException e) {
+                        System.out.println("Exception occurred while broadcastUpdatedMatrixMessage() in stream:" + e);
+                    }
+                });
+    }
+
+    private void broadcastWinnerMessage(String winner) {
+        gameManager.getAllPlayers()
+                .forEach(player -> {
+                    if (gameManager.isPseudoPlayer(player.getId())) {
+                        return;
+                    }
+                    try {
+                        send(player.getId(), Message.ofWinner(player.getId(), winner));
+                    } catch (IOException e) {
+                        System.out.println("Exception occurred while broadcastWinnerMessage() in stream:" + e);
+                    }
+                });
     }
 
 }

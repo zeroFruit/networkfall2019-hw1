@@ -2,6 +2,7 @@ package com.zerofruit.bingo.game;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GameManager {
@@ -42,6 +43,14 @@ public class GameManager {
         return this.room.findAllPlayer();
     }
 
+    public BingoPlayer getCopartner() {
+        return room.findAllPlayer()
+                .stream()
+                .filter(bingoPlayer -> bingoPlayer.getType().equals(PlayerType.COPARTNER))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Copoartner not exist"));
+    }
+
     public BingoMatrix createMatrix(String clientId) {
         return new BingoMatrix(clientId);
     }
@@ -79,12 +88,25 @@ public class GameManager {
         return result;
     }
 
-    public void askInSecret(String clientId, int number) {
+    public void askInSecret(String clientId, Integer number) {
+        if (number == null) {
+            System.out.println("Curprit not asked secret number");
+            return;
+        }
         if (!isCulpritPlayer(clientId)) {
             System.out.println("Your are not culprit, so do nothing!");
             return;
         }
         askedNumber = number;
+    }
+
+    public String isSomeoneBingo() {
+        return room.findAllPlayer()
+                .stream()
+                .filter(BingoPlayer::isBingo)
+                .findFirst()
+                .map(BingoPlayer::getId)
+                .orElse(null);
     }
 
     public boolean isPseudoPlayer(String id) {

@@ -14,10 +14,13 @@ public class DataHandler extends Thread {
 
     private PlayerInfo playerInfo;
 
-    public DataHandler(Socket socket, ObjectInputStream ois, PlayerInfo playerInfo) {
+    private BingoClient bingoClient;
+
+    public DataHandler(Socket socket, ObjectInputStream ois, PlayerInfo playerInfo, BingoClient bingoClient) {
         this.socket = socket;
         this.ois = ois;
         this.playerInfo = playerInfo;
+        this.bingoClient = bingoClient;
     }
 
     public void run() {
@@ -53,6 +56,7 @@ public class DataHandler extends Thread {
     }
 
     private void handle(Message message) {
+        System.out.println("Asdfasdf: " + message);
         switch (message.getMethod()) {
             case Method.JOIN_RESP:
                 synchronized (playerInfo) {
@@ -69,6 +73,7 @@ public class DataHandler extends Thread {
                             .turn(message.getTurn());
                 }
                 break;
+            // TODO: this currently not work
             case Method.MATRIX_UPDATED:
                 synchronized (playerInfo) {
                     playerInfo = playerInfo
@@ -78,6 +83,23 @@ public class DataHandler extends Thread {
             case Method.CHOOSE_RESP:
                 System.out.println("Successfully choose bingo number:" + message.getNumber());
                 break;
+            case Method.SECRET:
+                synchronized (playerInfo) {
+                    playerInfo = playerInfo
+                            .secret(message.getSecret());
+                }
+                break;
+            case Method.WINNER:
+                synchronized (playerInfo) {
+                    playerInfo = playerInfo
+                            .winner(message.getWinner());
+                }
+                // TODO: close connection with server
+//                bingoClient.close();
+                break;
+            default:
+                throw new IllegalArgumentException(
+                        String.format("unexpected method, got [%s]", message.getMethod()) );
         }
     }
 }

@@ -65,6 +65,40 @@ public class BingoMatrix implements Serializable {
         return false;
     }
 
+    public boolean isBingo() {
+        // check row
+        if (
+                marker[0][0] == marker[0][1] && marker[0][0] == marker[0][2] && marker[0][0] == marker[0][3] && marker[0][0] == marker[0][4] && marker[0][0] == MARK ||
+                marker[1][0] == marker[1][1] && marker[1][0] == marker[1][2] && marker[1][0] == marker[1][3] && marker[1][0] == marker[1][4] && marker[1][0] == MARK ||
+                marker[2][0] == marker[2][1] && marker[2][0] == marker[2][2] && marker[2][0] == marker[2][3] && marker[2][0] == marker[2][4] && marker[2][0] == MARK ||
+                marker[3][0] == marker[3][1] && marker[3][0] == marker[3][2] && marker[3][0] == marker[3][3] && marker[3][0] == marker[3][4] && marker[3][0] == MARK ||
+                marker[4][0] == marker[4][1] && marker[4][0] == marker[4][2] && marker[4][0] == marker[4][3] && marker[4][0] == marker[4][4] && marker[4][0] == MARK
+        ) {
+            return true;
+        }
+
+        // check column
+        if (
+                marker[0][0] == marker[1][0] && marker[0][0] == marker[2][0] && marker[0][0] == marker[3][0] && marker[0][0] == marker[4][0] && marker[0][0] == MARK ||
+                marker[0][1] == marker[1][1] && marker[0][1] == marker[2][1] && marker[0][1] == marker[3][1] && marker[0][1] == marker[4][1] && marker[0][1] == MARK ||
+                marker[0][2] == marker[1][2] && marker[0][2] == marker[2][2] && marker[0][2] == marker[3][2] && marker[0][2] == marker[4][2] && marker[0][2] == MARK ||
+                marker[0][3] == marker[1][3] && marker[0][3] == marker[2][3] && marker[0][3] == marker[3][3] && marker[0][3] == marker[4][3] && marker[0][3] == MARK ||
+                marker[0][4] == marker[1][4] && marker[0][4] == marker[2][4] && marker[0][4] == marker[3][4] && marker[0][4] == marker[4][4] && marker[0][4] == MARK
+        ) {
+            return true;
+        }
+
+        // check diagonal
+        if (
+                marker[0][0] == marker[1][1] && marker[0][0] == marker[2][2] && marker[0][0] == marker[3][3] && marker[0][0] == marker[4][4] && marker[0][0] == MARK ||
+                marker[0][4] == marker[1][3] && marker[0][4] == marker[2][2] && marker[0][4] == marker[3][1] && marker[0][4] == marker[4][0] && marker[0][4] == MARK
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
     public List<NumberAndMarker> getNumberAndMarkers() {
         List<NumberAndMarker> result = new ArrayList<>();
         for (int r = 0; r < matrix.length; r++)  {

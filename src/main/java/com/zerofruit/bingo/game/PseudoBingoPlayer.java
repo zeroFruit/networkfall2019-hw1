@@ -32,4 +32,9 @@ public class PseudoBingoPlayer implements BingoPlayer {
     public boolean chooseNumber(int number) {
         return bingoMatrix.markIfHas(number);
     }
+
+    @Override
+    public boolean isBingo() {
+        return bingoMatrix.isBingo();
+    }
 }

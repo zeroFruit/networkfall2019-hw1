@@ -26,7 +26,7 @@ public class BingoClient {
 
         this.playerInfo = playerInfo;
 
-        this.handler = new DataHandler(socket, ois, playerInfo);
+        this.handler = new DataHandler(socket, ois, playerInfo, this);
         this.handler.start();
 
         System.out.println("DataHandler running...");
@@ -42,6 +42,7 @@ public class BingoClient {
         try {
             ois.close();
             oos.close();
+            socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

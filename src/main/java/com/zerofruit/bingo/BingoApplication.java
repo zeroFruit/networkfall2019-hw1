@@ -104,11 +104,15 @@ public class BingoApplication extends Application {
         final Label matrixLabel = addLabel(gridPane, "[Your matrix]", 0, 9, 6);
         final Label gameStartLabel = addLabel(gridPane, "[Game Started?]", 0, 11, 3);
         final Label turnLabel = addLabel(gridPane, "[Your Turn is]", 0, 13, 3);
+        final Label secretLabel = addLabel(gridPane, "[Culprit send you the secret number]", 0, 15, 3);
+        final Label winnerLabel = addLabel(gridPane, "[Winner!!]", 0, 17, 3);
 
         playerInfoObserver.setRoleLabel(roleLabel);
         playerInfoObserver.setGameStartLabel(gameStartLabel);
         playerInfoObserver.setMatrixLabel(matrixLabel);
         playerInfoObserver.setTurnLabel(turnLabel);
+        playerInfoObserver.setSecretLabel(secretLabel);
+        playerInfoObserver.setWinnerLabel(winnerLabel);
 
         // Setting an action for the login button
         loginBtn.setOnAction(event -> {
@@ -146,19 +150,18 @@ public class BingoApplication extends Application {
             }
 
             try {
-                // TODO: this should be fixed
-                // TODO: add secret
                 bingoClient.send(
-                        Message.ofChooseRequest(accountLabel.getText(), number, null) );
+                        Message.ofChooseRequest(accountLabel.getText(), number, secret) );
             } catch (IOException e) {
                 e.printStackTrace();
             }
             statusLabel.setText(String.format("Submit number is %d", number));
             items.add(number.toString());
             numberTextField.clear();
+            secretTextField.clear();
         });
 
-        Scene scene = new Scene(gridPane, 540, 880);
+        Scene scene = new Scene(gridPane, 540, 1100);
         stage.setScene(scene);
         stage.show();
     }
