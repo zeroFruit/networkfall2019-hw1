@@ -23,7 +23,6 @@ public class PlayerInfoObserver implements PropertyChangeListener {
                 Platform.runLater(() -> roleLabel.setText(evt.getNewValue().toString()));
                 break;
             case "bingoMatrix":
-                System.out.println("at observer: " + evt.getNewValue().toString());
                 Platform.runLater(() -> matrixLabel.setText(evt.getNewValue().toString()));
                 break;
             case "gameStarted":

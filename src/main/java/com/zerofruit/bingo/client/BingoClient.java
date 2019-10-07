@@ -17,14 +17,10 @@ public class BingoClient {
 
     private DataHandler handler;
 
-    private PlayerInfo playerInfo;
-
     public BingoClient(PlayerInfo playerInfo) throws IOException {
         socket = new Socket("localhost", 8888);
         ois = new ObjectInputStream(socket.getInputStream());
         oos = new ObjectOutputStream(socket.getOutputStream());
-
-        this.playerInfo = playerInfo;
 
         this.handler = new DataHandler(socket, ois, playerInfo);
         this.handler.start();
@@ -46,9 +42,5 @@ public class BingoClient {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    synchronized public PlayerInfo getPlayerInfo() {
-        return playerInfo;
     }
 }

@@ -136,7 +136,6 @@ public class ServerHandler extends Thread {
         String winnerCandidate = gameManager.isSomeoneBingo();
         if (winnerCandidate != null) {
             broadcastWinnerMessage(winnerCandidate);
-
             // game done!
             System.out.println("Bingo game is finished");
         }
@@ -149,7 +148,6 @@ public class ServerHandler extends Thread {
             String copartnerId = gameManager.getCopartner().getId();
             send(copartnerId, Message.ofSecret(copartnerId, message.getSecret()));
         }
-
         gameManager.increaseCurrentTurn();
 
         return Message.ofChooseResult(
@@ -193,7 +191,6 @@ public class ServerHandler extends Thread {
                     if (gameManager.isPseudoPlayer(player.getId())) {
                         return;
                     }
-
                     try {
                         send(player.getId(), Message.ofMatrixUpdated(player.getId(), selected));
                     } catch (IOException e) {

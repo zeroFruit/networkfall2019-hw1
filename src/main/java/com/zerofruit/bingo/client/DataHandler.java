@@ -33,6 +33,7 @@ public class DataHandler extends Thread {
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
+
         } finally {
             if (ois != null) {
                 try {

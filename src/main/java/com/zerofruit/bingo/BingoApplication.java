@@ -21,13 +21,13 @@ import java.io.IOException;
 
 public class BingoApplication extends Application {
 
-    static BingoClient bingoClient;
+    private static BingoClient bingoClient;
 
-    static PlayerInfo playerInfo;
+    private static PlayerInfo playerInfo;
 
-    static PlayerInfoObserver playerInfoObserver;
+    private static PlayerInfoObserver playerInfoObserver;
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
+    public static void main(String[] args) throws IOException {
 
         String mode = args[0];
 
